@@ -13,7 +13,8 @@ import { CreatePost } from "~/app/_components/create-post";
 import { api } from "~/trpc/server";
 
 export default async function Home() {
-  const hello = await api.post.hello.query({ text: "from tRPC" });
+  const allPosts = await api.post.getAll.query();
+  const hello = await api.test.hello.query({ text: "from test router tRPC" });
 
   const user = await currentUser();
 
@@ -60,6 +61,11 @@ export default async function Home() {
             <CrudShowcase />
           </>
         )}
+        <div>
+          {allPosts?.map((post) => {
+            return <div key={post.id}>{post.content} </div>;
+          })}
+        </div>
       </div>
     </main>
   );
