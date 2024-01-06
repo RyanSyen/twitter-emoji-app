@@ -8,9 +8,14 @@ import {
   // useClerk,
 } from "@clerk/nextjs";
 import Link from "next/link";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 // import { CreatePost } from "~/app/_components/create-post";
 import { api } from "~/trpc/server";
+import { type RouterOutputs } from "~/trpc/shared";
+import Image from "next/image";
+dayjs.extend(relativeTime);
 
 export default async function Home() {
   const allPosts = await api.post.getAll.query();
@@ -19,51 +24,28 @@ export default async function Home() {
   const user = await currentUser();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
+    <main className="flex h-screen justify-center">
+      <div className="w-full border-x border-slate-400 md:max-w-2xl">
+        <div className="flex border-b border-b-slate-400 p-4">
+          {!user && (
+            <div className="flex justify-center">
+              <SignInButton />
             </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
+          )}
+          {!!user && (
+            <div className="flex w-full justify-between">
+              {/* <CrudShowcase /> */}
+              <CreatePostWizard />
+              <div className="flex w-24 justify-center align-middle">
+                <SignOutButton />
+              </div>
             </div>
-          </Link>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-2xl text-white">
-            {hello ? hello.greeting : "Loading tRPC query..."}
-          </p>
+          )}
         </div>
 
-        {!user && <SignInButton />}
-        {!!user && (
-          <>
-            <SignOutButton />
-            <CrudShowcase />
-          </>
-        )}
-        <div>
-          {allPosts?.map((post) => {
-            return <div key={post.id}>{post.content} </div>;
+        <div className="flex flex-col">
+          {allPosts?.map((postList) => {
+            return <PostView key={postList.post.id} {...postList} />;
           })}
         </div>
       </div>
@@ -71,18 +53,51 @@ export default async function Home() {
   );
 }
 
-async function CrudShowcase() {
-  const latestPost = await api.post.getLatest.query();
+const CreatePostWizard = async () => {
+  const user = await currentUser();
+
+  if (!user) return null;
 
   return (
-    <div className="w-full max-w-xs">
-      {latestPost ? (
-        <p className="truncate">Your most recent post: {latestPost.name}</p>
-      ) : (
-        <p>You have no posts yet.</p>
-      )}
-
-      {/* <CreatePost /> */}
+    <div className="flex w-full gap-3">
+      <Image
+        src={user.imageUrl}
+        alt="Profile Image"
+        className="h-16 w-16 rounded-full"
+        width={64}
+        height={64}
+        priority
+      />
+      <input
+        type="text"
+        placeholder="Type some emojis!"
+        className="grow bg-transparent outline-none"
+      />
     </div>
   );
-}
+};
+
+type PostWithUser = RouterOutputs["post"]["getAll"][number]; // this tells ts we want an element from the "getAll" mtd
+const PostView = (props: PostWithUser) => {
+  const { post, author } = props;
+  return (
+    <div key={post.id} className="flex gap-3 border-b border-slate-400 p-4">
+      <Image
+        src={author.profileImageUrl}
+        alt={`@${author.username}'s profile picture`}
+        className="h-16 w-16 rounded-full"
+        width={64}
+        height={64}
+      />
+      <div className="flex flex-col">
+        <div className="flex text-slate-300">
+          <span>{`@${author.username}`}</span>
+          <span className="font-thin">{` · ${dayjs(
+            post.createdAt,
+          ).fromNow()}`}</span>
+        </div>
+        <span>{post.content}</span>
+      </div>
+    </div>
+  );
+};
