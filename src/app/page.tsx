@@ -15,43 +15,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { api } from "~/trpc/server";
 import { type RouterOutputs } from "~/trpc/shared";
 import Image from "next/image";
+import { LoadingPage } from "~/components/loading";
 dayjs.extend(relativeTime);
-
-export default async function Home() {
-  const allPosts = await api.post.getAll.query();
-  const hello = await api.test.hello.query({ text: "from test router tRPC" });
-
-  const user = await currentUser();
-
-  return (
-    <main className="flex h-screen justify-center">
-      <div className="w-full border-x border-slate-400 md:max-w-2xl">
-        <div className="flex border-b border-b-slate-400 p-4">
-          {!user && (
-            <div className="flex justify-center">
-              <SignInButton />
-            </div>
-          )}
-          {!!user && (
-            <div className="flex w-full justify-between">
-              {/* <CrudShowcase /> */}
-              <CreatePostWizard />
-              <div className="flex w-24 justify-center align-middle">
-                <SignOutButton />
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col">
-          {allPosts?.map((postList) => {
-            return <PostView key={postList.post.id} {...postList} />;
-          })}
-        </div>
-      </div>
-    </main>
-  );
-}
 
 const CreatePostWizard = async () => {
   const user = await currentUser();
@@ -101,3 +66,49 @@ const PostView = (props: PostWithUser) => {
     </div>
   );
 };
+
+const Feed = async () => {
+  const posts = await api.post.getAll.query();
+
+  if (!posts) return <div>Something went wrong</div>;
+
+  return (
+    <div className="flex flex-col">
+      {posts?.map((postList) => {
+        return <PostView key={postList.post.id} {...postList} />;
+      })}
+    </div>
+  );
+};
+
+export default async function Home() {
+  // const allPosts = await api.post.getAll.query();
+
+  // const hello = await api.test.hello.query({ text: "from test router tRPC" });
+
+  const user = await currentUser();
+
+  return (
+    <main className="flex h-screen justify-center">
+      <div className="w-full border-x border-slate-400 md:max-w-2xl">
+        <div className="flex border-b border-b-slate-400 p-4">
+          {!user && (
+            <div className="flex justify-center">
+              <SignInButton />
+            </div>
+          )}
+          {!!user && (
+            <div className="flex w-full justify-between">
+              {/* <CrudShowcase /> */}
+              <CreatePostWizard />
+              <div className="flex w-24 justify-center align-middle">
+                <SignOutButton />
+              </div>
+            </div>
+          )}
+        </div>
+        <Feed />
+      </div>
+    </main>
+  );
+}
