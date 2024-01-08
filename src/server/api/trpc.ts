@@ -35,12 +35,18 @@ import { headers } from "next/headers";
 //   };
 // };
 
-export async function createTRPCContext(opts: CreateNextContextOptions) {
+interface CtxOpts extends CreateNextContextOptions {
+  headers: Headers;
+}
+
+export async function createTRPCContext(opts: CtxOpts) {
   const user = await currentUser();
+  const { headers } = opts;
 
   return {
     db,
     currentUser: user,
+    headers,
   };
 }
 
