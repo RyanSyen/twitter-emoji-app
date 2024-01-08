@@ -16,31 +16,8 @@ import { api } from "~/trpc/server";
 import { type RouterOutputs } from "~/trpc/shared";
 import Image from "next/image";
 import { LoadingPage } from "~/components/loading";
+import { CreatePostWizard } from "./_components/create-post";
 dayjs.extend(relativeTime);
-
-const CreatePostWizard = async () => {
-  const user = await currentUser();
-
-  if (!user) return null;
-
-  return (
-    <div className="flex w-full gap-3">
-      <Image
-        src={user.imageUrl}
-        alt="Profile Image"
-        className="h-16 w-16 rounded-full"
-        width={64}
-        height={64}
-        priority
-      />
-      <input
-        type="text"
-        placeholder="Type some emojis!"
-        className="grow bg-transparent outline-none"
-      />
-    </div>
-  );
-};
 
 type PostWithUser = RouterOutputs["post"]["getAll"][number]; // this tells ts we want an element from the "getAll" mtd
 const PostView = (props: PostWithUser) => {
