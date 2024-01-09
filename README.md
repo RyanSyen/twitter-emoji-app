@@ -2,6 +2,16 @@
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
+## Building Blocks
+
+- Rate Limiting : https://github.com/upstash/ratelimit
+- Toast Messages : https://react-hot-toast.com/
+- tRPC : build & consume typesafe APIs without schemas or code-generation https://trpc.io/docs/
+- Zod : typescript-first schema validation lib https://zod.dev/?id=introduction
+- Clerk : auth and user mgmt lib https://clerk.com/docs/quickstarts/nextjs
+- PlanetScale : MySQL-compatible database that brings you scale, performance, and reliability
+- Prisma : A server-side lib that helps devs to read and write data to db in an intuitive, efficient and safe way https://www.prisma.io/
+
 ## What's next? How do I make an app with this?
 
 We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
