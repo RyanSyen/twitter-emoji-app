@@ -7,6 +7,8 @@ import Image from "next/image";
 import { api } from "~/trpc/react";
 import { useUser } from "@clerk/nextjs";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { LoadingPage, LoadingSpinner } from "~/components/loading";
 
 export const CreatePostWizard = () => {
   const router = useRouter();
@@ -23,9 +25,19 @@ export const CreatePostWizard = () => {
     onSuccess: () => {
       router.refresh();
       setInput("");
-      //console.log("cache: ", cache); // empty cache not sure why
+      console.log("cache: ", cache); // empty cache not sure why
       // invalidate function not working, fallback to using router.refresh()
       //void ctx.post.getAll.invalidate().then(() => console.log("invalidated")); // invalidateQueries is used to invalidate and refetch queries in the cache
+    },
+    onError: (e) => {
+      const errMsg = e.data?.zodError?.fieldErrors.content;
+
+      toast.error(
+        errMsg?.[0] ? errMsg[0] : "Failed to post! Please try again later.",
+        {
+          position: "bottom-center",
+        },
+      );
     },
   });
 
@@ -48,10 +60,28 @@ export const CreatePostWizard = () => {
         value={input}
         onChange={onChangeInput}
         disabled={onClickPost.isLoading}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") {
+              onClickPost.mutate({ content: input });
+            }
+          }
+        }}
       />
-      <button onClick={() => onClickPost.mutate({ content: input })}>
-        Post
-      </button>
+      {input !== "" && !onClickPost.isLoading && (
+        <button
+          onClick={() => onClickPost.mutate({ content: input })}
+          disabled={onClickPost.isLoading}
+        >
+          Post
+        </button>
+      )}
+      {onClickPost.isLoading && (
+        <div className="flex items-center justify-center">
+          <LoadingSpinner size={20} />
+        </div>
+      )}
     </div>
   );
 };

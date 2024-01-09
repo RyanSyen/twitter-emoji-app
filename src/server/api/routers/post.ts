@@ -18,22 +18,18 @@ const filterUser = (user: User) => {
   };
 };
 
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+// Create a new ratelimiter, that allows 5 requests per minute
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.fixedWindow(5, "1 m"),
+  analytics: true,
+});
+
 // publicProcedure is a mtd that gens a func that your client calls
 export const postRouter = createTRPCRouter({
-  // create: publicProcedure
-  //   .input(z.object({ name: z.string().min(1) }))
-  //   .mutation(async ({ ctx, input }) => {
-  //     // simulate a slow db call
-  //     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  //     return ctx.db.post.create({
-  //       data: {
-  //         name: input.name,
-  //         content:
-  //       },
-  //     });
-  //   }),
-
   getLatest: publicProcedure.query(({ ctx }) => {
     return ctx.db.post.findFirst({
       orderBy: { createdAt: "desc" },
@@ -72,11 +68,14 @@ export const postRouter = createTRPCRouter({
   create: privateProcedure
     .input(
       z.object({
-        content: z.string().emoji().min(1).max(280),
+        content: z.string().emoji("Only emojis are allowed").min(1).max(280),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const { id: authorId, username } = ctx.currentUser;
+
+      const { success } = await ratelimit.limit(authorId);
+      if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
 
       return await ctx.db.post.create({
         data: {
