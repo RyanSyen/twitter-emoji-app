@@ -11,9 +11,12 @@ import {
 } from "~/server/api/trpc";
 
 const filterUser = (user: User) => {
+  const username = !user.username
+    ? `${user.firstName}${user.lastName}`
+    : user.username;
   return {
     id: user.id,
-    username: user.username,
+    username,
     profileImageUrl: user.imageUrl,
   };
 };
@@ -72,7 +75,8 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id: authorId, username } = ctx.currentUser;
+      const { id: authorId, username, firstName, lastName } = ctx.currentUser;
+      const name = !username ? `${firstName}${lastName}` : username;
 
       const { success } = await ratelimit.limit(authorId);
       if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
@@ -81,7 +85,7 @@ export const postRouter = createTRPCRouter({
         data: {
           authorId,
           content: input.content,
-          name: username!,
+          name,
         },
       });
     }),

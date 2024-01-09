@@ -8,7 +8,7 @@ import { api } from "~/trpc/react";
 import { useUser } from "@clerk/nextjs";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { LoadingPage, LoadingSpinner } from "~/components/loading";
+import { LoadingSpinner } from "~/app/_components/loading";
 
 export const CreatePostWizard = () => {
   const router = useRouter();

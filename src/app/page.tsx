@@ -15,7 +15,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { api } from "~/trpc/server";
 import { type RouterOutputs } from "~/trpc/shared";
 import Image from "next/image";
-import { LoadingPage } from "~/components/loading";
+import { LoadingPage } from "~/app/_components/loading";
 import { CreatePostWizard } from "./_components/create-post";
 dayjs.extend(relativeTime);
 
