@@ -28,9 +28,12 @@ import { headers } from "next/headers";
  * @see https://trpc.io/docs/server/context
  */
 
+// export interface CustomContextOptions extends CreateNextContextOptions {
+//   headers: Headers;
+// }
+
 export async function createTRPCContext(opts: { headers: Headers }) {
   const user = await currentUser();
-  // const { headers, ...others } = opts;
 
   return {
     db,

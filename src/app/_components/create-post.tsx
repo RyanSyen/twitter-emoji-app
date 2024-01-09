@@ -6,12 +6,14 @@ import Image from "next/image";
 
 import { api } from "~/trpc/react";
 import { useUser } from "@clerk/nextjs";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 
 export const CreatePostWizard = () => {
-  //   const router = useRouter();
+  const router = useRouter();
   const [input, setInput] = useState<string>("");
   const { user } = useUser();
   const ctx = api.useUtils();
+  const cache = useQueryClient().getQueryCache();
 
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.currentTarget.value);
@@ -19,9 +21,11 @@ export const CreatePostWizard = () => {
 
   const onClickPost = api.post.create.useMutation({
     onSuccess: () => {
-      //   router.refresh();
+      router.refresh();
       setInput("");
-      void ctx.post.getAll.invalidate(); // invalidateQueries is used to invalidate and refetch queries in the cache
+      //console.log("cache: ", cache); // empty cache not sure why
+      // invalidate function not working, fallback to using router.refresh()
+      //void ctx.post.getAll.invalidate().then(() => console.log("invalidated")); // invalidateQueries is used to invalidate and refetch queries in the cache
     },
   });
 
