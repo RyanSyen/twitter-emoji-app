@@ -1,13 +1,12 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { type ResolvingMetadata, type NextPage, type Metadata } from "next";
+import { type ResolvingMetadata, type Metadata } from "next";
 import Head from "next/head";
 import { api } from "~/trpc/server";
 import { PageLayout } from "../_components/page-layout";
 import Image from "next/image";
+import PostView from "../_components/post-view";
+import { Suspense } from "react";
+import { LoadingSpinner } from "../_components/loading";
 
-// export const metadata = {
-//   title: "Profile",
-// };
 type generateMetadataProps = {
   params: { slug: string };
   searchParams: Record<string, string | string[] | undefined>;
@@ -25,27 +24,26 @@ export async function generateMetadata(
   };
 }
 
+const ProfileFeed = async ({ userId }: { userId: string }) => {
+  const posts = await api.post.getByUserId.query({ userId });
+
+  if (!posts || posts.length === 0) return <div>User has not posted</div>;
+
+  return (
+    <div className="flex flex-col">
+      {posts.map((data) => {
+        return <PostView key={data.post.id} {...data} />;
+      })}
+    </div>
+  );
+};
+
 const ProfilePage = async ({ params }: { params: { slug: string } }) => {
-  const user = await currentUser();
-  //   const { data, isLoading } = api.profile.getUserByUsername.useQuery({
-  //     username: !user?.username
-  //       ? `${user?.firstName}${user?.lastName}`
-  //       : user.username,
-  //   });
-
-  console.log("params: ", params.slug);
-
   const data = await api.profile.getUserByUsername.query({
-    // username: !user?.username
-    //   ? `${user?.firstName}${user?.lastName}`
-    //   : user.username,
-    // username: "ryansyen",
     userid: params.slug,
   });
 
   if (!data) return <div>404</div>;
-
-  console.log(data);
 
   return (
     <>
@@ -67,6 +65,9 @@ const ProfilePage = async ({ params }: { params: { slug: string } }) => {
           {data.username}
         </div>
         <div className="w-full border-b border-slate-400" />
+        <Suspense fallback={<LoadingSpinner />}>
+          <ProfileFeed userId={params.slug} />
+        </Suspense>
       </PageLayout>
     </>
   );
