@@ -14,6 +14,12 @@ const config = {
       },
     ],
   },
+  typescript: {
+    ignoreBuildErrors: true, // will be performed in github ci build actions
+  },
+  eslint: {
+    ignoreDuringBuilds: true, // will be performed in github ci build actions
+  },
 };
 
 export default config;
