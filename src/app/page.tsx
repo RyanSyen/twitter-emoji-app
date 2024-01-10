@@ -17,7 +17,7 @@ import { type RouterOutputs } from "~/trpc/shared";
 import Image from "next/image";
 import { LoadingPage } from "~/app/_components/loading";
 import { CreatePostWizard } from "./_components/create-post";
-import { PageLayout } from "./_components/layout";
+import { PageLayout } from "./_components/page-layout";
 dayjs.extend(relativeTime);
 
 type PostWithUser = RouterOutputs["post"]["getAll"][number]; // this tells ts we want an element from the "getAll" mtd

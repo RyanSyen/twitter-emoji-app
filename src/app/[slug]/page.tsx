@@ -2,7 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { type ResolvingMetadata, type NextPage, type Metadata } from "next";
 import Head from "next/head";
 import { api } from "~/trpc/server";
-import { PageLayout } from "../_components/layout";
+import { PageLayout } from "../_components/page-layout";
 import Image from "next/image";
 
 // export const metadata = {

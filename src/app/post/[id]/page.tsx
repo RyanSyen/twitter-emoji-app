@@ -1,6 +1,6 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { PageLayout } from "~/app/_components/layout";
+import { PageLayout } from "~/app/_components/page-layout";
 
 export const metadata = {
   title: "Post",
