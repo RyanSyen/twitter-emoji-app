@@ -17,6 +17,7 @@ import { type RouterOutputs } from "~/trpc/shared";
 import Image from "next/image";
 import { LoadingPage } from "~/app/_components/loading";
 import { CreatePostWizard } from "./_components/create-post";
+import { PageLayout } from "./_components/layout";
 dayjs.extend(relativeTime);
 
 type PostWithUser = RouterOutputs["post"]["getAll"][number]; // this tells ts we want an element from the "getAll" mtd
@@ -33,7 +34,7 @@ const PostView = (props: PostWithUser) => {
       />
       <div className="flex flex-col">
         <div className="flex text-slate-300">
-          <Link href={`/@${author.username}`}>
+          <Link href={`/${author.id}`}>
             <span>{`@${author.username}`}</span>
           </Link>
           <Link href={`/post/${post.id}`}>
@@ -70,26 +71,25 @@ export default async function Home() {
   const user = await currentUser();
 
   return (
-    <main className="flex h-screen justify-center">
-      <div className="w-full border-x border-slate-400 md:max-w-2xl">
-        <div className="flex border-b border-b-slate-400 p-4">
-          {!user && (
-            <div className="flex justify-center">
-              <SignInButton />
+    <PageLayout>
+      <div className="flex border-b border-b-slate-400 p-4">
+        {!user && (
+          <div className="flex justify-center">
+            <SignInButton />
+          </div>
+        )}
+        {!!user && (
+          <div className="flex w-full justify-between">
+            {/* <CrudShowcase /> */}
+            <CreatePostWizard />
+            <div className="flex w-24 justify-center align-middle">
+              <SignOutButton />
             </div>
-          )}
-          {!!user && (
-            <div className="flex w-full justify-between">
-              {/* <CrudShowcase /> */}
-              <CreatePostWizard />
-              <div className="flex w-24 justify-center align-middle">
-                <SignOutButton />
-              </div>
-            </div>
-          )}
-        </div>
-        <Feed />
+          </div>
+        )}
       </div>
-    </main>
+
+      <Feed />
+    </PageLayout>
   );
 }
