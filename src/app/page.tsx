@@ -22,10 +22,6 @@ const Feed = async () => {
 };
 
 export default async function Home() {
-  // const allPosts = await api.post.getAll.query();
-
-  // const hello = await api.test.hello.query({ text: "from test router tRPC" });
-
   const user = await currentUser();
 
   return (
