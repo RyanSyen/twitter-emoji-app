@@ -13,8 +13,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Twitter Emoji App",
-  description: "Twitter Emoji App using T3 stack",
+  title: "Twitter Emoji App NextJS Project with T3 Stack",
+  description:
+    "A step by step tutorial building a Twitter Emoji App using T3 stack by Theo",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
