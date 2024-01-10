@@ -4,6 +4,8 @@ import { api } from "~/trpc/server";
 import { CreatePostWizard } from "./_components/create-post";
 import { PageLayout } from "./_components/page-layout";
 import PostView from "./_components/post-view";
+import { Suspense } from "react";
+import { LoadingSpinner } from "./_components/loading";
 
 const Feed = async () => {
   const posts = await api.post.getAll.query();
@@ -44,8 +46,9 @@ export default async function Home() {
           </div>
         )}
       </div>
-
-      <Feed />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Feed />
+      </Suspense>
     </PageLayout>
   );
 }

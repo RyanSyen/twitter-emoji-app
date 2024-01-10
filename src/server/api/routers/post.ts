@@ -46,6 +46,24 @@ const addUserDataToPost = async (posts: Post[]) => {
 };
 
 export const postRouter = createTRPCRouter({
+  getById: publicProcedure
+    .input(z.object({ postId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.db.post.findUnique({
+        where: {
+          id: input.postId,
+        },
+      });
+
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const postData = (await addUserDataToPost([post]))[0];
+
+      if (!postData) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return postData;
+    }),
+
   getLatest: publicProcedure.query(({ ctx }) => {
     return ctx.db.post.findFirst({
       orderBy: { createdAt: "desc" },
